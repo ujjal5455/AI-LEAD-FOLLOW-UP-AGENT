@@ -1,0 +1,26 @@
+# Optional: a local PostgreSQL in Docker, as an alternative to
+# `uv run python scripts/local_db.py start`. Same port and credentials, so
+# backend/.env works unchanged with either.
+#
+#   docker compose up -d      # start
+#   docker compose down       # stop (data is kept in the "pgdata" volume)
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres # local development only
+      POSTGRES_DB: lead_agent
+    ports:
+      - "127.0.0.1:5433:5432" # reachable from this computer only
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lead_agent"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

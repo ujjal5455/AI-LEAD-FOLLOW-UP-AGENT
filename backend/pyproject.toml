@@ -1,0 +1,44 @@
+[project]
+name = "lead-agent-backend"
+version = "0.1.0"
+description = "AI Lead Follow-Up Agent: FastAPI backend"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.0",           # database migrations
+    "email-validator>=2.3.0",    # email address validation in request schemas
+    "fastapi>=0.141.1",          # web framework
+    "psycopg[binary]>=3.3.6",    # PostgreSQL driver
+    "pwdlib[argon2]>=0.3.1",     # password hashing (Argon2)
+    "pydantic-settings>=2.15.0", # typed settings from environment variables
+    "pyjwt>=2.15.1",             # signed login tokens
+    "sqlalchemy>=2.1.1",         # database toolkit / ORM
+    "uvicorn[standard]>=0.54.0", # server that runs the FastAPI app
+]
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",   # used by FastAPI's TestClient
+    "pgserver>=0.1.4",  # bundled PostgreSQL for local dev and tests (no Docker needed)
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",     # linter + formatter
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "SIM"]
+ignore = ["B008"]  # FastAPI's Depends(...) in defaults is the intended pattern
+
+[tool.ruff.lint.isort]
+# The migrations folder is named "alembic" too; the library is still third-party.
+known-third-party = ["alembic"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106"]  # asserts and fake passwords are fine in tests
+"scripts/**" = ["S603", "S607"]        # the local DB script runs fixed PostgreSQL commands
+"alembic/**" = ["E501"]
